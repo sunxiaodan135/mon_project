@@ -1,0 +1,98 @@
+sc.exe create MongoDB binPath= "\"C:\Program Files\MongoDB\Server\3.4\bin\mongod.exe\" --service --config=\"C:\Program Files\MongoDB\Server\3.4\mongod.cfg\"" DisplayName= "MongoDB" start= "auto"
+
+//进入my_test数据库
+use my_test
+
+//向数据库中的user集合插入文档
+db.users.insert({
+ username:"sunwukonmg"
+
+});
+//查询user集合中的文档
+db.users.find();
+//向user中插入一个文档
+db.users.insert({
+ username:"猪八戒"
+
+});
+//统计users中的文档数量
+db.users.find().count();
+//查询数据库users集合中username为sunwukonmg的文档
+db.users.find({username:"sunwukonmg"});
+//添加一个属性adress给username为sunwukonmg的随想，属性值huaguoshan
+db.users.update({username:"sunwukonmg"},{$set:{address:"huaguoshan"}});
+//使用username为tangseng的替换猪八戒的文档
+db.users.replaceOne({username:"猪八戒"},{username:"tangseng"});
+db.users.find();
+//删除username为sunwukonmg的address属性
+db.users.update({username:"sunwukonmg"},{$unset:{address:"huaguoshan"}});
+db.users.update({username:"猪八戒"},{$set:{address:"高老庄"}});
+//文档属性值也可以是文档，当一个文档的属性值是文档，则这个文档叫内嵌文档
+//向tangseng文档中添加hobby：{cities:["beijing","shanghua","shenzhen"],movies:["sanguo","hero"]}
+db.users.update({username:"tangseng"},{$set:{hobby:{cities:["beijing","shanghua","shenzhen"],movies:["sanguo","hero"]}}});
+
+//给sunwukonmg也添加hobby：{movies:["sanguo","hero"]}
+db.users.update({username:"sunwukonmg"},{$set:{hobby:{movies:["sanguo","hero"]}}});
+
+//查询喜欢电影为hero的文档
+//monogdb支持内嵌文档的属性进行查询，如果查询内嵌文档则通过.的形式进行匹配
+//如果通过内嵌文档查询，属性名必须引号
+db.users.find({"hobby.movies":"hero"});
+
+//向sunwukonmg中添加新的电影Interstellar---用
+//push:可以一只添加重复的
+//addToSet:向数组中添加新元素，不能更添加重复的
+db.users.update({username:"sunwukonmg"},{$push:{"hobby.movies":"Interstellar"}});
+
+//删除喜欢beijing的用户
+db.users.remove({"hobby.cities":"beijing"});
+db.users.find();
+
+//删除users集合
+db.users.remove({});
+db.users.drop();
+show dbs;
+
+//向number中插入20000条数据 4.3秒
+db
+for (var i=0;i<20000;i++){
+db.numbers.insert({num:i});
+}
+
+db.numbers.find();
+db.numbers.remove({});
+//0.1s
+var arr=[];
+for(var i=1;i<=20000;i++){
+arr.push({num:i});
+}
+db.numbers.insert(arr);
+db.numbers.find();
+
+//查询numbers中num为500的文档
+db.numbers.find({num:500});
+
+//查询numbers中num大于为5000的文档
+db.numbers.find({num:{$gt:500}});
+
+
+//查询numbers中num小于为5000的文档
+db.numbers.find({num:{$lt:500}});
+
+
+//查询numbers中num小于为500大于300的文档
+db.numbers.find({num:{$gt:300,$lt:500}});
+
+
+//查询numbers中前10条
+db.numbers.find().limit(10);
+//skip跳过
+
+//分页显示
+//每页显示10条:1-10  11-20 21-30 ...
+//skip((页码-1)*每页显示的条数).limit（每页显示的条数）；
+db
+
+
+//查询numbers中前11条-20条
+db.numbers.find().skip(10).limit(10);
